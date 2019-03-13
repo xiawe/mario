@@ -24,7 +24,7 @@ class Pipe {
             this.pipes.push(p1)
             this.pipes.push(p2)
         }
-        log(this.pipes)
+        // log(this.pipes)
     }
     resetPosion(p1, p2) {
         p1.y = -randomBetween(0, 40)
@@ -41,7 +41,7 @@ class Pipe {
             if (p.x < -20) {
                 log('<', this.spaceX,this.pipeNum)
                 p.x += this.spaceX * (this.pipeNum + 1)
-                log('?', this.spaceX)
+                // log('?', this.spaceX)
             }
         }
     }
@@ -72,12 +72,12 @@ class SceneTitle extends XiaScene {
     setup() {
         var game = this.game
         this.bg = XiaImage.new(game, 'bg')
-        log('bg', this.bg,game)
+        // log('bg', this.bg,game)
         this.bg.y = 300
         this.bg.w = 400
         // this.bg.h = this.bg.h * 2
         this.addElement(this.bg)
-        log('pipe', this.pipe)
+        // log('pipe', this.pipe)
         this.addElement(this.pipe)
         // this.land = XiaImage.new(game, 'land')
         // this.addElement(this.land)
@@ -92,7 +92,7 @@ class SceneTitle extends XiaScene {
         }
     }
     setupInputs(w) {
-        log('this.bird',w)
+        // log('this.bird',w)
         this.game.registerAction('a', function(keyStatus) {
             w.flipX = true
             w.move(-10, keyStatus)

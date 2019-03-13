@@ -31,10 +31,31 @@ var __main = function() {
         bird3: 'img/bird-03.png',
         bird4: 'img/bird-04.png',
     }
-    var game = XiaGame.instance(window.fps, images, function(g) {
-        // var s = Scene.new(g) 
-        var s = SceneTitle.new(g)
-        g.runScene(s)
-    })
+
+    const ajax = request => {
+        let r = new XMLHttpRequest()
+        r.open('GET', request.url, true)
+        r.responseType = 'arraybuffer'
+        r.onreadystatechange = event => {
+            if (r.readyState == 4) {
+            request.callback(r.response)
+            }
+        }
+        r.send()
+    }
+
+    let request = {
+        url: 'mario.nes',
+        callback(r) {
+          window.bytes = new Uint8Array(r)
+          log('mario file', window.bytes)
+          var game = XiaGame.instance(window.fps, images, function(g) {
+            // var s = Scene.new(g) 
+            var s = SceneTitle.new(g)
+            g.runScene(s)
+        })
+        }
+      }
+      ajax(request)
 }
 __main()

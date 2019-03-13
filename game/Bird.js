@@ -1,7 +1,7 @@
 class Bird extends XiaAnimation {
     constructor(game) {
         super(game)
-        log('bird', this)
+        // log('bird', this)
         this.flipX = false
         this.angle = 0
         this.vy = 0
