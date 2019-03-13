@@ -1,121 +1,115 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
-  <head>
-    <meta charset="utf-8">
-    <title>xiario</title>
-    <style media="screen">
-      #id-canvas{
-        border: 1px solid black;
-      }
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>D1</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- <link rel="stylesheet" type="text/css" media="screen" href="main.css" /> -->
+    <script src="game/utils.js"></script>
+    <script src="game/xia_game.js"></script>
+    <script src="game/xia_scene.js"></script>
+    <script src="game/xia_image.js"></script>
+    <script src="game/xia_label.js"></script>
+    <script src="game/xia_particle_system.js"></script>
+    <script src="game/xia_animation.js"></script>
+    <script src="game/Bird.js"></script>
+
+    <script src="scene/main/paddle.js"></script>
+    <script src="scene/main/ball.js"></script>
+    <script src="scene/main/block.js"></script>
+    <script src="scene/main/scene.js"></script>
+
+    <script src="scene/title/scene_title.js"></script>
+    <script src="scene/end/scene_end.js"></script>
+
+    <script src="level.js"></script>
+    <script src="config.js"></script>
+    <style>
+        #id-canvas{
+            border:1px solid black;
+        }
     </style>
-  </head>
-  <body>
-      <h3></h3>
-      <canvas id="id-canvas" width="640" height="640"></canvas>
-      <div class="xia-control">
-        <button data-action="change_offset" data-offset="-1024">-1024</button>
-        <button data-action="change_offset" data-offset="1024">1024</button>
-      </div>
-      <script type="text/javascript">
-        const log = console.log.bind(console)
+</head>
+<body>
+    <canvas id="id-canvas" width="400" height="500"></canvas>
+    <input type="range" class="slide" value="30">
+    <div class="game-control">
+        <!-- <input type="range" value="" max="15" min="1"
+            data-value="config.player_speed" 
+            class="slide-input"
+        >
+        玩家速度：<label class="slide-label"></label> -->
+    </div>
+    <script src="main.js"></script>
+    <script>
+        var es = el => document.querySelectorAll(el)
 
-        const e = sel => document.querySelector(sel)
-
-        const ajax = request => {
-          let r = new XMLHttpRequest()
-          r.open('GET', request.url, true)
-          r.responseType = 'arraybuffer'
-          r.onreadystatechange = event => {
-            if (r.readyState == 4) {
-              request.callback(r.response)
+        var bindAll = function(el, event, callback) {
+            var l = es(el)
+            for (let i = 0; i < l.length; i++) {
+                const e = l[i]
+                e.addEventListener(event, function(event) {
+                    callback(event)
+                })
+                
             }
-          }
-          r.send()
         }
 
-        // 一个图块的 8 * 8 像素
-        const drawBlock = (context, data, x, y, pixelWdith) => {
-          const colors = [
-            'white',
-            '#FE1000',
-            '#ffB010',
-            '#AA3030',
-          ]
-          let w = pixelWdith
-          for (let i = 0; i < 8; i++) {
-            // 1 个 block 16 byte 
-            let p1 = data[i]
-            // ----------------------- 不懂 -------------------------
-            let p2 = data[i + 8]
-            for (let j = 0; j < 8; j++) {
-              // 8 bit per line
-              // log('test', p1 >> 7)
-              let c1 = (p1 >> (7 - j)) & 0b00000001
-              // log('c1', c1)
-              let c2 = (p2 >> (7 - j)) & 0b00000001
-            // ----------------------- 不懂 -------------------------
-              let pixel = (c2 << 1) + c1
-              // log('pixel', pixel)
-              let color = colors[pixel]
-              context.fillStyle = color
-              let px = x + j * w
-              let py = y + i * w
-              context.fillRect(px, py, w, w)
-            }            
-          }
+        var templateControl = function(key, item) {
+            var t = `
+                <div class="input-wrap">
+                    <input type="range" value="" max="300" min="100"
+                        data-value="${item.value}" 
+                        data-name="${key}"
+                        class="slide-input"
+                    >
+                    ${item.comments}<label class="slide-label"></label>
+                </div>    
+            `
+            return t
         }
 
-        // 我觉得 drawNes 函数画的是一页 8 * 8 图块
-        const drawNes = bytes => {
-          let canvas = e('#id-canvas')
-          let context = canvas.getContext('2d')
-          let blockSize = 8
-          let pixelSize = 8
-          let pixelWdith = 10
-          let numberOfBytesPerBlock = 16
-          for (let i = 0; i < blockSize; i++) {
-            for (let j = 0; j < blockSize; j++) {
-              // 算出 bytes
-              let x = j * pixelSize * pixelWdith
-              let y = i * pixelSize * pixelWdith
-              // 计算 block 字节的偏移
-              let index = window.offset + (i * 8 + j ) * numberOfBytesPerBlock
-              drawBlock(context, bytes.slice(index), x, y, pixelWdith)              
-            }            
-          }
-        }
-
-        const actions = {
-          change_offset(offset) {
-            e('h3').innerText = window.offset
-            drawNes(window.bytes)
-          },
-        }
-
-        const bindEvents = () => {
-          e('.xia-control').addEventListener('click', event => {
-            var action = event.target.dataset.action
-            var offset = Number(event.target.dataset.offset)
-            window.offset += offset
-            actions[action] && actions[action](offset)
-          })
-        }
-        
-        const __main = () => {
-          window.offset = 32768
-          let request = {
-            url: 'mario.nes',
-            callback(r) {
-              window.bytes = new Uint8Array(r)
-              log('bytes', bytes, r)
-              bindEvents()
-              drawNes(bytes)
+        var insertControls = function() {
+            var keys = Object.keys(config)
+            log('keys', keys)
+            for (var key of keys) {
+                var div = es('.game-control')[0]
+                var item = config[key]
+                var html = templateControl(key, item)
+                // log('html', html, div)
+                div.insertAdjacentHTML('beforeend', html)
             }
-          }
-          ajax(request)
         }
 
-        __main()
-      </script>
-  </body>
+        var bindEvents = function() {
+            bindAll('.slide-input', 'input', function(event) {
+                var target = event.target
+                var bindVar = target.dataset.value
+                var v = target.value
+                log('bindvar', bindVar, target)
+                target.setAttribute('data-value', v)
+                var label = target.closest('div').querySelector('.slide-label')
+                config[target.dataset.name].value = v
+                // log('config', label,label.innerText)
+                // eval(bindVar + '.value =' + v)
+                label.innerText = v
+            })
+        }
+
+        // bindAll('.slide-input', 'input', function(event) {
+        //     var target = event.target
+        //     var bindVar = target.dataset.value
+        //     var v = target.value
+        //     eval(bindVar + '=' + v)
+        //     target.closest('div').querySelector('.slide-label').innerText = v
+        // })
+
+        var main = function() {
+            insertControls()
+            bindEvents()
+        }
+        main()
+    </script>
+</body>
 </html>
