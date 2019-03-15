@@ -4,15 +4,25 @@
     <meta charset="utf-8">
     <title>xiario</title>
     <style media="screen">
-      #id-canvas{
+      canvas{
         border: 1px solid black;
       }
     </style>
   </head>
   <body>
       <h3></h3>
-      <canvas id="id-canvas" width="640" height="640"></canvas>
-      <canvas id="id-canvas-sprite" width="160" height="320"></canvas>
+      <canvas id="id-canvas" 
+        data-action="draw_tile"
+        data-type="source"
+        width="640" height="640"></canvas>
+      <canvas id="id-canvas-sprite" 
+        data-action="draw_tile"
+        data-type="tile"
+        width="160" height="320"></canvas>
+      <canvas id="" 
+        data-action="draw_tile"
+        data-type="tile"
+        width="160" height="160"></canvas>
       <div class="xia-control">
         <button data-action="change_offset" data-offset="-1024">-1024</button>
         <button data-action="change_offset" data-offset="1024">1024</button>
@@ -86,16 +96,17 @@
           }
         }
 
-        const drawSprite = data => {
-          let context = e('#id-canvas-sprite').getContext('2d')
+        const drawSprite = (canvas, offsetX, offsetY) => {
+          let data = window.bytes.slice(window.tileOffset)
+          let context = canvas.getContext('2d')
           let pixelsPerBlock = 8
           let pixelWdith = 10
           let blockWidth = pixelsPerBlock * pixelWdith
           let offset = 0
-          for (let i = 0; i < 4; i++) {
-            for (let j = 0; j < 2; j++) {
-              let x = j * blockWidth
-              let y = i * blockWidth
+          for (let i = 0; i < 1; i++) {
+            for (let j = 0; j < 1; j++) {
+              let x = (offsetX + j) * blockWidth
+              let y = (offsetY + i) * blockWidth
               drawBlock(context, data.slice(offset), x, y, pixelWdith)    
               offset += 16     
             }
@@ -104,23 +115,42 @@
         }
 
         const actions = {
-          change_offset(offset) {
+          change_offset(event) {
+            let offset = Number(event.target.dataset.offset)
+            window.offset += offset
             e('h3').innerText = window.offset
             drawNes(window.bytes)
           },
+          draw_tile(event) {
+            let canvas = event.target
+            let rect = canvas.getBoundingClientRect()
+            let x = event.pageX - rect.left
+            let y = event.pageY - rect.top
+            // i 行, j 列
+            let i = Math.floor(x / 80)
+            let j = Math.floor(y / 80)
+            let bytesPerBlock = 16
+            let type = event.target.dataset.type
+            if (type == 'source') {
+              window.tileOffset = window.offset + (j * 8 + i) * bytesPerBlock 
+            } else if (type == 'tile') {
+              let offsetX = i
+              let offsetY = j
+              drawSprite(canvas, offsetX, offsetY)
+            }
+            // log('draw_tile', type, x, y, i, j)
+          }
         }
 
         const bindEvents = () => {
-          e('.xia-control').addEventListener('click', event => {
+          e('body').addEventListener('click', event => {
             var action = event.target.dataset.action
-            var offset = Number(event.target.dataset.offset)
-            window.offset += offset
-            actions[action] && actions[action](offset)
+            actions[action] && actions[action](event)
           })
         }
         
         const __main = () => {
-          window.offset = 32768
+          window.offset = 32784
           let tileOffset = 32784
           let request = {
             url: 'mario.nes',
@@ -130,14 +160,14 @@
               bindEvents()
               drawNes(bytes)
               let step = 0
-              setInterval(function() {
-                step++
-                step %= 4
-                bytesPerBlock = 16
-                blockPerSprite = 8
-                let offset = tileOffset + bytesPerBlock * blockPerSprite * step
-                drawSprite(bytes.slice(offset))
-              }, 200)
+              // setInterval(function() {
+                // step++
+                // step %= 4
+                // let bytesPerBlock = 16
+                // let blockPerSprite = 8
+                // let offset = tileOffset + bytesPerBlock * blockPerSprite * step
+                // drawSprite(bytes.slice(offset))
+              // }, 200)
             }
           }
           ajax(request)
