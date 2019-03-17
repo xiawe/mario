@@ -110,23 +110,31 @@ class XiaNesSprite {
         this.animationName = name
     }
     draw() {
-        this.drawSprite()
+        // this.drawSprite()
         var context = this.game.context
-        context.save()
+        // context.save()
+        // log('mario w h ',this.w, this.h)
         var w2 = this.w / 2
         var h2 = this.h / 2
         var x = this.x + w2
         var y = this.y + h2
         log('pos', x, y,w2, h2, this.flipX)
-        context.translate(x, y)
+        // context.translate(x, y)
         if (this.flipX) {
+            context.save()
+            context.translate(x, y)
             context.scale(-1, 1)
+            context.translate(-w2, -h2)
+            this.drawSprite()
+            context.restore()
+        } else {
+            this.drawSprite()
         }
         // context.rotate(this.angle * Math.PI / 180)
         // context.translate(-w2, -h2)
-        this.drawSprite()
+        // this.drawSprite()
         // context.drawImage(this.texture, 0, 0)
-        context.restore()
+        // context.restore()
         // this.drawSprite()
     }
     update() {
