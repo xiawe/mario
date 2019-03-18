@@ -19,13 +19,14 @@
         data-action="draw_tile"
         data-type="tile"
         width="160" height="320"></canvas>
-      <canvas id="" 
+      <canvas id="id-canvas-tile" 
         data-action="draw_tile"
         data-type="tile"
         width="160" height="160"></canvas>
       <div class="xia-control">
         <button data-action="change_offset" data-offset="-1024">-1024</button>
         <button data-action="change_offset" data-offset="1024">1024</button>
+        <button data-sel="#id-canvas-tile" data-action="clear_tile">clear</button>
       </div>
       <script type="text/javascript">
         const log = console.log.bind(console)
@@ -56,7 +57,6 @@
           for (let i = 0; i < 8; i++) {
             // 1 个 block 16 byte 
             let p1 = data[i]
-            // ----------------------- 不懂 -------------------------
             let p2 = data[i + 8]
             for (let j = 0; j < 8; j++) {
               // 8 bit per line
@@ -64,10 +64,12 @@
               let c1 = (p1 >> (7 - j)) & 0b00000001
               // log('c1', c1)
               let c2 = (p2 >> (7 - j)) & 0b00000001
-            // ----------------------- 不懂 -------------------------
               let pixel = (c2 << 1) + c1
               // log('pixel', pixel)
               let color = colors[pixel]
+              // if (color == '#ffB010') {
+              //   continue
+              // }
               context.fillStyle = color
               let px = x + j * w
               let py = y + i * w
@@ -120,6 +122,11 @@
             window.offset += offset
             e('h3').innerText = window.offset
             drawNes(window.bytes)
+          },
+          clear_tile(event) {
+            let sel = event.target.dataset.sel
+            let context = e(sel).getContext('2d')
+            context.clearRect(0, 0, 1000, 1000)
           },
           draw_tile(event) {
             let canvas = event.target

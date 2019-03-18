@@ -51,7 +51,8 @@ var __main = function() {
           log('mario file', window.bytes)
           var game = XiaGame.instance(window.fps, images, function(g) {
             // var s = Scene.new(g) 
-            var s = SceneTitle.new(g)
+            // var s = SceneTitle.new(g)
+            var s = SceneEditor.new(g)
             g.runScene(s)
         })
         }
