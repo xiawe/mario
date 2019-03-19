@@ -11,7 +11,7 @@ class XiaNesSprite {
         this.vy = 0
         this.s = 0
         this.vx = 0
-        this.mx = 0
+        this.vm = 0
         this.keyStatus = 'up'
         this.gy = 10 * 0.2
         this.game = game
@@ -157,32 +157,22 @@ class XiaNesSprite {
         if (this.y > 55) {
             this.y = 55
         }
-        let s = this.s * 0.5
-        if (this.keyStatus == 'down') {
-            this.vx += 0.23 * s
-            this.mx = - 0.2 * s
-        } else if (this.keyStatus = 'up') {
-            this.vx--
-            if (this.s < 0 || this.vx <= 0) {
-                this.vx = 0
-                this.mx = 0
-            }
+        this.vx += this.vm
+        // 判断速度和摩擦力是否同向
+        if (this.vx * this.vm > 0) {
+            this.vx = 0
+            this.vm = 0
+        } else {
+            this.x += this.vx
         }
     }
     move(s, keyStatus) {
         this.flipX = s < 0
         this.s = s
         if (keyStatus == 'down') {
-            this.keyStatus = 'down'
-            // this.vx += 0.5 * s
-            // log('down vx', this.vx)
-            // this.mx = - 0.2 * s
-        } else {
-            this.keyStatus = 'up'
-            // this.vx--
-            // this.vx > 0 ? this.vx : 0
-        }
-        this.x += s + 0.25 * this.vx + this.mx
+            this.vx += 0.5 * s
+            this.vm = -0.3 * s
+        } 
     }
     jump() {
         this.vy = -10
