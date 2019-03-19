@@ -30,6 +30,10 @@ var __main = function() {
         bird2: 'img/bird-02.png',
         bird3: 'img/bird-03.png',
         bird4: 'img/bird-04.png',
+        t1: 'tiles/t1.png',
+        t2: 'tiles/t2.png',
+        t3: 'tiles/t3.png',
+        t4: 'tiles/t4.png',
     }
 
     const ajax = request => {
@@ -51,8 +55,8 @@ var __main = function() {
           log('mario file', window.bytes)
           var game = XiaGame.instance(window.fps, images, function(g) {
             // var s = Scene.new(g) 
-            // var s = SceneTitle.new(g)
             var s = SceneEditor.new(g)
+            // var s = SceneTitle.new(g)
             g.runScene(s)
         })
         }

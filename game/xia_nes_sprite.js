@@ -2,13 +2,17 @@ class XiaNesSprite {
     constructor(game) {
         this.bytes = window.bytes
         this.tileOffset = 32784
-        this.pixelWdith = 3
+        this.pixelWdith = 2
         this.rowsOfSprite = 4
         this.columnOfSprite = 2
         this.w = this.pixelWdith * 8 * this.columnOfSprite 
         this.h = this.pixelWdith * 8 * this.rowsOfSprite
         this.flipX = false
         this.vy = 0
+        this.s = 0
+        this.vx = 0
+        this.mx = 0
+        this.keyStatus = 'up'
         this.gy = 10 * 0.2
         this.game = game
         // this.animations = {
@@ -118,13 +122,14 @@ class XiaNesSprite {
         var h2 = this.h / 2
         var x = this.x + w2
         var y = this.y + h2
-        log('pos', x, y,w2, h2, this.flipX)
+        // log('pos', x, y,w2, h2, this.flipX)
         // context.translate(x, y)
         if (this.flipX) {
             context.save()
             context.translate(x, y)
             context.scale(-1, 1)
-            context.translate(-w2, -h2)
+            // context.translate(-w2, -h2)
+            context.translate(-x, -y) 
             this.drawSprite()
             context.restore()
         } else {
@@ -149,20 +154,35 @@ class XiaNesSprite {
         }
         this.y += this.vy
         this.vy += this.gy
-        if (this.y > 306) {
-            this.y = 306
+        if (this.y > 55) {
+            this.y = 55
+        }
+        let s = this.s * 0.5
+        if (this.keyStatus == 'down') {
+            this.vx += 0.23 * s
+            this.mx = - 0.2 * s
+        } else if (this.keyStatus = 'up') {
+            this.vx--
+            if (this.s < 0 || this.vx <= 0) {
+                this.vx = 0
+                this.mx = 0
+            }
         }
     }
     move(s, keyStatus) {
-        // log('move', keyStatus)
-        // var animationNames = {
-        //     down: 'run',
-        //     up: 'idle',
-        // }
-        // var name = animationNames[keyStatus]
-        // this.changeAnimation(name)
         this.flipX = s < 0
-        this.x += s
+        this.s = s
+        if (keyStatus == 'down') {
+            this.keyStatus = 'down'
+            // this.vx += 0.5 * s
+            // log('down vx', this.vx)
+            // this.mx = - 0.2 * s
+        } else {
+            this.keyStatus = 'up'
+            // this.vx--
+            // this.vx > 0 ? this.vx : 0
+        }
+        this.x += s + 0.25 * this.vx + this.mx
     }
     jump() {
         this.vy = -10

@@ -1,3 +1,41 @@
+class XiaTileMap {
+    constructor(game) {
+        this.game = game 
+        this.tiles = [
+            0, 2, 3, -1, 1,
+            1, 1, 3, -1, 2,
+            3, 3, 2, -1, 3,
+        ]
+        this.tileImages = [
+            XiaImage.new(game, 't1'),
+            XiaImage.new(game, 't2'),
+            XiaImage.new(game, 't3'),
+            XiaImage.new(game, 't4'),
+        ]
+        this.tileSize = 32
+        this.th = 5
+        this.tw = this.tiles.length / this.th
+    }
+    static new(...args) {
+        return new this(...args)
+    } 
+    draw() {
+        for (let i = 0; i < this.tiles.length; i++) {
+            let index = this.tiles[i]
+            if (index != -1) {
+                let image = this.tileImages[index]
+                // log('image', i, index, image)
+                image.x = Math.floor(i / this.th) * this.tileSize
+                image.y = i % this.th * this.tileSize
+                this.game.drawImg(image)         
+            }      
+        }
+    }
+    update() {
+
+    }
+}
+
 class SceneEditor extends XiaScene {
     constructor(game) {
         super(game)
@@ -33,9 +71,11 @@ class SceneEditor extends XiaScene {
             this.addElement(l)
             this.lands.push(l)
         }
+        this.map = XiaTileMap.new(game)
+        this.addElement(this.map)
         this.mario = XiaNesSprite.new(game)
         this.mario.x = 100
-        this.mario.y = 306
+        this.mario.y = 55
         this.addElement(this.mario)
     }
     setupInputs() {
