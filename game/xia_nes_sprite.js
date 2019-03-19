@@ -158,7 +158,7 @@ class XiaNesSprite {
             this.y = 55
         }
         this.vx += this.vm
-        // 判断速度和摩擦力是否同向
+        // 判断速度和摩擦力（负的）是否同向
         if (this.vx * this.vm > 0) {
             this.vx = 0
             this.vm = 0

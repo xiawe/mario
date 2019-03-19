@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>xiario</title>
+    <style media="screen">
+      canvas{
+        border: 1px solid black;
+      }
+    </style>
+  </head>
+  <body>
+      <h3></h3>
+      <canvas id="id-canvas" 
+        data-action="draw_tile"
+        width="512" height="480"></canvas>
+      <div class="block-choice">
+        <img src="../tiles/t1.png" data-action="draw_acive_tile" data-id="1">
+        <img src="../tiles/t2.png" data-action="draw_acive_tile" data-id="2">
+        <img src="../tiles/t3.png" data-action="draw_acive_tile" data-id="3">
+        <img src="../tiles/t4.png" data-action="draw_acive_tile" data-id="4">
+      </div>
+      <script type="text/javascript">
+        const log = console.log.bind(console)
+
+        const e = sel => document.querySelector(sel)
+
+        const drawSprite = (canvas, offsetX, offsetY) => {
+          let data = window.bytes.slice(window.tileOffset)
+          let context = canvas.getContext('2d')
+          let pixelsPerBlock = 8
+          let pixelWdith = 10
+          let blockWidth = pixelsPerBlock * pixelWdith
+          let offset = 0
+          for (let i = 0; i < 1; i++) {
+            for (let j = 0; j < 1; j++) {
+              let x = (offsetX + j) * blockWidth
+              let y = (offsetY + i) * blockWidth
+              drawBlock(context, data.slice(offset), x, y, pixelWdith)    
+              offset += 16     
+            }
+            
+          }
+        }
+
+        const actions = {
+            draw_acive_tile(event) {
+                let id = Number(event.target.dataset.id)
+                window.tileId = id
+                log('draw_acive_tile', id, window.tileId)
+            },
+            draw_tile(event) {
+                let tileWidth = 32
+                let canvas = event.target
+                let context = canvas.getContext('2d')
+                let rect = canvas.getBoundingClientRect()
+                let x = event.pageX - rect.left
+                let y = event.pageY - rect.top
+                // i 行, j 列
+                let i = Math.floor(x / 32)
+                let j = Math.floor(y / 32)
+                let x1 = i * tileWidth
+                let y1 = j * tileWidth
+                let bytesPerBlock = 16
+                log('window.tileId', window.tileId)
+                let img = new Image()
+                img.src = `../tiles/t${window.tileId}.png`
+                context.fillStyle = '#5080FF'
+                context.fillRect(x1, y1, tileWidth, tileWidth)
+                context.drawImage(img, x1, y1)
+                // log('draw_tile', type, x, y, i, j)
+            },
+        }
+
+        const bindEvents = () => {
+          e('body').addEventListener('click', event => {
+            var action = event.target.dataset.action
+            actions[action] && actions[action](event)
+          })
+        }
+
+        const drawTileAt = (x1, y1) => {
+            let tileWidth = 32
+            let canvas = event.target
+            let context = canvas.getContext('2d')
+            let img = new Image()
+            img.src = `../tiles/t${window.tileId}.png`
+            context.fillStyle = '#5080FF'
+            context.fillRect(x1, y1, tileWidth, tileWidth)
+            context.drawImage(img, x1, y1)
+        }
+
+        e('canvas').addEventListener('mousedown', event => {
+            window.keydown = true
+        })
+
+        e('canvas').addEventListener('mouseup', event => {
+            window.keydown = false
+        })
+
+        e('canvas').addEventListener('mousemove', event => {
+            if (window.keydown) {
+                let tileWidth = 32
+                let canvas = event.target
+                let context = canvas.getContext('2d')
+                let rect = canvas.getBoundingClientRect()
+                let x = event.pageX - rect.left
+                let y = event.pageY - rect.top
+                let i = Math.floor(x / 32)
+                let j = Math.floor(y / 32)
+                let x1 = i * tileWidth
+                let y1 = j * tileWidth
+                drawTileAt(x1, y1)
+            }
+        })
+        
+        const init = () => {
+            window.keydown = false
+            window.tileId = null
+            let canvas = e('#id-canvas')
+            let context = canvas.getContext('2d')
+            context.fillStyle = '#5080FF'
+            context.fillRect(0, 0, 512, 480)
+        }
+
+        const __main = () => {
+            init()
+            bindEvents()
+        }
+
+        __main()
+      </script>
+  </body>
+</html>
