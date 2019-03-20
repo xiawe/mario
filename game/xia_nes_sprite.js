@@ -1,5 +1,6 @@
 class XiaNesSprite {
-    constructor(game) {
+    constructor(game, map) {
+        this.map = map
         this.bytes = window.bytes
         this.tileOffset = 32784
         this.pixelWdith = 2
@@ -10,28 +11,18 @@ class XiaNesSprite {
         this.flipX = false
         this.vy = 0
         this.s = 0
+        this.maxSpeed = 15
         this.vx = 0
         this.vm = 0
         this.keyStatus = 'up'
         this.gy = 10 * 0.2
         this.game = game
-        // this.animations = {
-        //     idle: [],
-        //     run: [],
-        // }
-        // for (let i = 1; i < 5; i++) {
-        //     var name = `bird${i}`
-        //     var m = game.textureByName(name)
-        //     this.animations.idle.push(m)
-        // }
         this.frameIndex = 0
         this.frameCount = 4
         this.angle = 0
-        // this.animationName = 'idle'
-        // this.texture = this.frames()[0]
     }
-    static new(game) {
-        return new this(game)
+    static new(...args) {
+        return new this(...args)
     }
     drawBlock(context, data, x, y, pixelWdith) {
         const colors = [
@@ -114,16 +105,11 @@ class XiaNesSprite {
         this.animationName = name
     }
     draw() {
-        // this.drawSprite()
         var context = this.game.context
-        // context.save()
-        // log('mario w h ',this.w, this.h)
         var w2 = this.w / 2
         var h2 = this.h / 2
         var x = this.x + w2
         var y = this.y + h2
-        // log('pos', x, y,w2, h2, this.flipX)
-        // context.translate(x, y)
         if (this.flipX) {
             context.save()
             context.translate(x, y)
@@ -135,29 +121,30 @@ class XiaNesSprite {
         } else {
             this.drawSprite()
         }
-        // context.rotate(this.angle * Math.PI / 180)
-        // context.translate(-w2, -h2)
-        // this.drawSprite()
-        // context.drawImage(this.texture, 0, 0)
-        // context.restore()
-        // this.drawSprite()
     }
     update() {
-        // log('this.frameCount',this.frameCount)
-        // this.frameCount++
-        // this.frameCount %= 4
+        let i = Math.floor(this.x / 32)
+        let j = Math.floor(this.y / 32) + 2
+        let onGround = this.map.onTheGround(i, j)
+        // log('onGround', onGround, this.vy)
         this.frameCount--
         if (this.frameCount == 0) {
             this.frameCount = 6
             this.frameIndex = (this.frameIndex + 1) % 3
-            // this.texture = this.frames()[this.frameIndex]
+        }
+        if (onGround && this.vy > 0) {
+            this.vy = 0
         }
         this.y += this.vy
         this.vy += this.gy
-        if (this.y > 55) {
-            this.y = 55
+        if (this.y > 420) {
+            this.y = 420
         }
         this.vx += this.vm
+        if (Math.abs(this.vx) >= this.maxSpeed) {
+            this.vx > 0 ? this.vx = this.maxSpeed : this.vx = -this.maxSpeed
+            log('max vx', this.vx)
+        }
         // 判断速度和摩擦力（负的）是否同向
         if (this.vx * this.vm > 0) {
             this.vx = 0
@@ -165,6 +152,7 @@ class XiaNesSprite {
         } else {
             this.x += this.vx
         }
+
     }
     move(s, keyStatus) {
         this.flipX = s < 0

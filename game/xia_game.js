@@ -45,7 +45,7 @@ class XiaGame {
             this.keydowns[key] = null
         }
         this.update()
-        this.context.clearRect(0, 0, 400, 650)
+        this.context.clearRect(0, 0, 512, 480)
         this.draw()
         setTimeout(() => {
             this.runLoop()
