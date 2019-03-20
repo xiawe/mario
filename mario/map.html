@@ -68,6 +68,7 @@
                 context.fillStyle = '#5080FF'
                 context.fillRect(x1, y1, tileWidth, tileWidth)
                 context.drawImage(img, x1, y1)
+                window.map.setTiles(i, j, window.tileId)
                 // log('draw_tile', type, x, y, i, j)
             },
         }
@@ -79,8 +80,10 @@
           })
         }
 
-        const drawTileAt = (x1, y1) => {
+        const drawTileAt = (i, j) => {
             let tileWidth = 32
+            let x1 = i * tileWidth
+            let y1 = j * tileWidth
             let canvas = event.target
             let context = canvas.getContext('2d')
             let img = new Image()
@@ -88,6 +91,7 @@
             context.fillStyle = '#5080FF'
             context.fillRect(x1, y1, tileWidth, tileWidth)
             context.drawImage(img, x1, y1)
+            window.map.setTiles(i, j, window.tileId)
         }
 
         e('canvas').addEventListener('mousedown', event => {
@@ -108,13 +112,36 @@
                 let y = event.pageY - rect.top
                 let i = Math.floor(x / 32)
                 let j = Math.floor(y / 32)
-                let x1 = i * tileWidth
-                let y1 = j * tileWidth
-                drawTileAt(x1, y1)
+                drawTileAt(i, j)
             }
         })
+
+        class Map {
+            constructor() {
+                this.tiles = []
+                this.width = 16
+                this.height = 15
+                this.setup()
+            }
+            setup() {
+                let s = this.width * this.height
+                for (let i = 0; i < s; i++) {
+                    this.tiles.push(0)
+                }
+            }
+            setTiles(i, j, id) {
+                let index = i * this.height + j
+                this.tiles[index] = id
+                log('setTiles', this.tiles)
+            }
+            exportJson() {
+                let s = JSON.stringify(this.tiles)
+                log('s', s)
+            }
+        } 
         
         const init = () => {
+            window.map = new Map()
             window.keydown = false
             window.tileId = null
             let canvas = e('#id-canvas')
